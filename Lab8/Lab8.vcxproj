@@ -18,27 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="MyVector3.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="MyVector3.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\..\..\..\pictures\SFML-LOGO.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="ASSETS\FONTS\ariblk.ttf" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{6714ead0-d89d-40ba-8995-843c2ea91eca}</ProjectGuid>
-    <RootNamespace>Lab9Starter</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <ProjectName>Lab8Starter</ProjectName>
+    <ProjectGuid>{be1b46aa-a7c7-45ee-8935-96deb7121d5f}</ProjectGuid>
+    <RootNamespace>Lab8</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -91,10 +75,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML_SDK)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML_SDK)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SFML_SDK)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SFML_SDK)/lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -102,7 +86,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SFML_SDK)\include</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SFML_SDK)/lib</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -111,12 +99,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML_SDK)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML_SDK)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SFML_SDK)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SFML_SDK)/lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,12 +114,25 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SFML_SDK)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SFML_SDK)/lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="game.h" />
+    <ClInclude Include="MyMatrix3.h" />
+    <ClInclude Include="MyVector3.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyMatrix3.cpp" />
+    <ClCompile Include="MyVector3.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

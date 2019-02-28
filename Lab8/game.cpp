@@ -25,7 +25,7 @@ Game::Game() :
 {
 	for (size_t i = 0; i < 3; i++)
 	{
-		m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),CORNFLOWER_BLUE };		
+		m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),CORNFLOWER_BLUE };
 	}
 	for (size_t i = 3; i < 6; i++)
 	{
@@ -76,10 +76,10 @@ void Game::processEvents()
 /// </summary>
 /// <param name="t_deltaTime">frame time</param>
 void Game::update(sf::Time t_deltaTime)
-{	
+{
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 	{
-		m_shapePoints[0] += {0.0, 1.2, 0.0};		
+		m_shapePoints[0] += {0.0, 1.2, 0.0};
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))
 	{
