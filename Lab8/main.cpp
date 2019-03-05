@@ -1,8 +1,8 @@
 /// <summary>
 /// Author: Ben Millar – C00236772
-/// Date:
-/// Estimated time to complete:
-/// Session 1 Start: End:
+/// Date: 28/02/2019
+/// Estimated time to complete: 12 hours
+/// Session 1 Start: 22:50 End: 23:10 02/03/2019
 /// </summary>
 #ifdef _DEBUG 
 #pragma comment(lib,"sfml-graphics-d.lib") 

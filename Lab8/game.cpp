@@ -1,35 +1,38 @@
-// author Peter Lowe
+/// <summary>
+/// Author: Ben Millar – C00236772
+/// Date: 28/02/2019
+/// Estimated time to complete: 12 hours
+/// Session 1 Start: 22:50 End: 23:10 02/03/2019
+/// </summary>
 
 #include "Game.h"
 #include <iostream>
-
-
-
-#include "Game.h"
-#include <iostream>
-
 
 
 Game::Game() :
 	m_window{ sf::VideoMode{ 800, 480 }, "SMFL Game" },
 	m_triangle{ sf::Triangles },
+	m_quad{ sf::Quads },
 	m_shapePoints{
 		 { 100.0,150.0, 1.0 },  // initial positions for triangle
 		 { 100.0,350.0, 1.0 },
-		 { 200.0,350.0, 1.0 },
-		 { 300.0,150.0, 1.0 },  // initial positions for second triangle
 		 { 300.0,350.0, 1.0 },
-		 { 400.0,350.0, 1.0 }
+		 { 400.0,150.0, 1.0 },  // initial positions for second triangle
+		 { 400.0,350.0, 1.0 },
+		 { 600.0,350.0, 1.0 }
 }
 
 {
-	for (size_t i = 0; i < 3; i++)
+	for (size_t i = 0; i < 6; i++)
 	{
-		m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),CORNFLOWER_BLUE };
-	}
-	for (size_t i = 3; i < 6; i++)
-	{
-		m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),GRAY };
+		if (i >= 3)
+		{
+			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),GRAY };
+		}
+		else
+		{
+			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),CORNFLOWER_BLUE };
+		}
 	}
 }
 
@@ -61,12 +64,20 @@ void Game::run()
 /// </summary>
 void Game::processEvents()
 {
-	sf::Event newEvent;
-	while (m_window.pollEvent(newEvent))
+	sf::Event event;
+	while (m_window.pollEvent(event))
 	{
-		if (newEvent.type == sf::Event::Closed)
+		if (event.type == sf::Event::Closed)
 		{
 			m_window.close();
+		}
+
+		if (event.type == sf::Event::KeyPressed)
+		{
+			if (event.key.code == sf::Keyboard::Escape)
+			{
+				m_window.close();
+			}
 		}
 	}
 }
@@ -77,13 +88,52 @@ void Game::processEvents()
 /// <param name="t_deltaTime">frame time</param>
 void Game::update(sf::Time t_deltaTime)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		m_shapePoints[0] += {0.0, 1.2, 0.0};
+		for (int i = 0; i < 3; i++)
+		{
+			m_shapePoints[i] = MyMatrix3::translation({ 0.0,-1.0,0.0 }) * m_shapePoints[i];
+		}
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
-		m_shapePoints[1] += {1.0, 0.0, 0.0};
+		for (int i = 0; i < 3; i++)
+		{
+			m_shapePoints[i] = MyMatrix3::translation({ 0.0,1.0,0.0 }) * m_shapePoints[i];
+		}
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			m_shapePoints[i] = MyMatrix3::translation({ -1.0,0.0,0.0 }) * m_shapePoints[i];
+		}
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			m_shapePoints[i] = MyMatrix3::translation({ 1.0,0.0,0.0 }) * m_shapePoints[i];
+		}
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			m_shapePoints[i] = MyMatrix3::rotationZ(3.14159 / 180.0) * m_shapePoints[i];
+		}
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			m_shapePoints[i] = MyMatrix3::rotationZ(-3.14159 / 180.0) * m_shapePoints[i];
+		}
 	}
 	m_triangle.clear();
 	for (int i = 0; i < NO_POINTS; i++)

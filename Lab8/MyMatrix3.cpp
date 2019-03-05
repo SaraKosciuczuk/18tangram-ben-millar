@@ -4,9 +4,18 @@
 /// Estimated time to complete: 8 hours
 /// Session 1 Start: 09:45 End: 10:00 14/02/2019
 /// Session 2 Start: 11:40 End: 12:00 14/02/2019
+/// Session 3 Start: 14:05 End: 15:25 14/02/2019
+/// Session 4 Start: 21:25 End: 22:25 14/02/2019
+/// Session 5 Start: 10:30 End: 10:55 15/02/2019 
+/// Session 6 Start: 17:05 End: 17:25 15/02/2019 
+/// Session 7 Start: 15:00 End: 16:00 20/02/2019
+/// Session 8 Start: 14:00 End: 14:40 21/02/2019
+/// Session 9 Start: 12:20 End: 12:50 26/02/2019
+/// Session 10 Start: 16:20 End: 16:50 27/02/2019 // TOTAL TIME: 6:20
 /// </summary>
 
 #include "MyMatrix3.h"
+#include <math.h>
 
 /// <summary>
 /// Default (null) constructor for MyMatrix3
@@ -58,10 +67,6 @@ MyMatrix3::~MyMatrix3()
 /// <returns>inputted matrix as a string</returns>
 std::string MyMatrix3::toString() const
 {
-	/*std::string output = "[" + std::to_string(m11) + ", " + std::to_string(m12) + ", " + std::to_string(m13) + "|" + "\n" +
-					     "|" + std::to_string(m21) + ", " + std::to_string(m22) + ", " + std::to_string(m23) + "|" + "\n" +
-					     "|" + std::to_string(m31) + ", " + std::to_string(m32) + ", " + std::to_string(m33) + "]";*/
-
 	std::string output = "[";
 
 	for (int i = 0; i < NUM_ROWS; i++) // for all rows
@@ -266,17 +271,14 @@ MyMatrix3 MyMatrix3::inverse() const
 
 	double determinant = this->determinant(); // get determinant of input matrix
 
-	if (determinant != 0)
-	{
-		// determine adjucate of input matrix
-		rows[0] = { m[2][2] * m[1][1] - m[2][1] * m[1][2], m[2][1] * m[0][2] - m[2][2] * m[0][1], m[1][2] * m[0][1] - m[1][1] * m[0][2] };
-		rows[1] = { m[2][0] * m[1][2] - m[2][2] * m[1][0], m[2][2] * m[0][0] - m[2][0] * m[0][2], m[1][0] * m[0][2] - m[1][2] * m[0][0] };
-		rows[2] = { m[2][1] * m[1][0] - m[2][0] * m[1][1], m[2][0] * m[0][1] - m[2][1] * m[0][0], m[1][1] * m[0][0] - m[1][0] * m[0][1] };
+	// determine adjucate of input matrix
+	rows[0] = { m[2][2] * m[1][1] - m[2][1] * m[1][2], m[2][1] * m[0][2] - m[2][2] * m[0][1], m[1][2] * m[0][1] - m[1][1] * m[0][2] };
+	rows[1] = { m[2][0] * m[1][2] - m[2][2] * m[1][0], m[2][2] * m[0][0] - m[2][0] * m[0][2], m[1][0] * m[0][2] - m[1][2] * m[0][0] };
+	rows[2] = { m[2][1] * m[1][0] - m[2][0] * m[1][1], m[2][0] * m[0][1] - m[2][1] * m[0][0], m[1][1] * m[0][0] - m[1][0] * m[0][1] };
 
-		result = { rows[0],rows[1],rows[2] }; // create 3x3 matrix from rows
+	result = { rows[0],rows[1],rows[2] }; // create 3x3 matrix from rows
 
-		result = result * (1 / determinant); // inverse = 1/determinant(adjucate)
-	}
+	result = result * (1 / determinant); // inverse = 1/determinant(adjucate)
 
 	return result;
 }
@@ -329,57 +331,91 @@ MyVector3 MyMatrix3::column(const int t_column) const
 }
 
 
-///// <summary>
-///// Determines the matrix for counter-clockwise rotation about the Z-axis
-///// </summary>
-///// <param name="t_angleRadians">Angle of rotation</param>
-///// <returns>Rotation matrix</returns>
-//MyMatrix3 MyMatrix3::rotationZ(const double t_angleRadians)
-//{
-//	MyVector3 rowOne, rowTwo, rowThree;
-//
-//	rowOne = { 1.0,0.0,0.0 };
-//	rowTwo = { 0.0,cos(t_angleRadians),-sin(t_angleRadians) };
-//	rowThree = { 0.0, sin(t_angleRadians),cos(t_angleRadians) };
-//
-//	MyMatrix3 rotation{ rowOne,rowTwo,rowThree };
-//
-//	return rotation;
-//}
-//
-///// <summary>
-///// Determines the matrix for counter-clockwise rotation about the Y-axis
-///// </summary>
-///// <param name="t_angleRadians">Angle of rotation</param>
-///// <returns>Rotation matrix</returns>
-//MyMatrix3 MyMatrix3::rotationY(const double t_angleRadians)
-//{
-//	MyVector3 rowOne, rowTwo, rowThree;
-//
-//	rowOne = { cos(t_angleRadians),0.0,sin(t_angleRadians) };
-//	rowTwo = { 0.0,1.0,0.0 };
-//	rowThree = { -sin(t_angleRadians), 0.0, cos(t_angleRadians) };
-//
-//	MyMatrix3 result{ rowOne,rowTwo,rowThree };
-//
-//	return result;
-//}
-//
-//
-///// <summary>
-///// Determines the matrix for counter-clockwise rotation about the X-axis
-///// </summary>
-///// <param name="t_angleRadians">Angle of rotation</param>
-///// <returns>Rotation matrix</returns>
-//MyMatrix3 MyMatrix3::rotationX(const double t_angleRadians)
-//{
-	//MyVector3 rowOne, rowTwo, rowThree;
+/// <summary>
+/// Creates a matrix for the translation of a 3 dimensional point about the XY plane
+/// </summary>
+/// <param name="t_displacement">3D vector representing the 2D translation amount</param>
+/// <returns>3D matrix for the translation of a 3D point</returns>
+MyMatrix3 MyMatrix3::translation(const MyVector3 t_displacement)
+{
+	MyMatrix3 result = { 1.0, 0.0, t_displacement.x,
+						 0.0, 1.0, t_displacement.y,
+						 0.0, 0.0, 1.0 };
 
-	//rowOne = { 1.0,0.0,0.0 };
-	//rowTwo = { 0.0,cos(t_angleRadians),-sin(t_angleRadians) };
-	//rowThree = { 0.0, sin(t_angleRadians),cos(t_angleRadians) };
+	return result;
+}
 
-	//MyMatrix3 result{ rowOne,rowTwo,rowThree };
+/// <summary>
+/// Generates a 3x3 matrix for scaling a point in 3 dimensions
+/// </summary>
+/// <param name="t_scalingfactor">Factor to scale by</param>
+/// <returns>A matrix for scaling a point in 3 dimensions</returns>
+MyMatrix3 MyMatrix3::scale(const double t_scalingfactor)
+{
+	MyMatrix3 result;
 
-	//return result;
-//}
+	//for (int i = 0; i < NUM_ROWS; i++) 
+	//{
+	//	for (int j = 0; j < NUM_COLS; j++)
+	//	{
+	//		(i == j) ? result.m[i][j] = t_scalingfactor : result.m[i][j] = 0.0;
+	//	}
+	//}
+
+	// My elitist scaling code
+	for (int i = 0; i < NUM_COLS; i++)
+	{
+		// [0,0], [1,1], and [2,2] should be the scaling factor, all others should be 0.
+		result.m[i][0] = (i == 0) ? t_scalingfactor : 0.0;
+		result.m[i][1] = (i == 1) ? t_scalingfactor : 0.0;
+		result.m[i][2] = (i == 2) ? t_scalingfactor : 0.0;
+	}
+
+	return result;
+}
+
+
+/// <summary>
+/// Determines the matrix for counter-clockwise rotation about the Z-axis
+/// </summary>
+/// <param name="t_angleRadians">Angle of rotation</param>
+/// <returns>Rotation matrix</returns>
+MyMatrix3 MyMatrix3::rotationZ(const double t_angleRadians)
+{
+	MyMatrix3 rotation = {	cos(t_angleRadians), -sin(t_angleRadians), 0.0,
+							sin(t_angleRadians), cos(t_angleRadians), 0.0,
+							0.0, 0.0, 1.0};
+
+	return rotation;
+}
+
+/// <summary>
+/// Determines the matrix for counter-clockwise rotation about the Y-axis
+/// </summary>
+/// <param name="t_angleRadians">Angle of rotation</param>
+/// <returns>Rotation matrix</returns>
+MyMatrix3 MyMatrix3::rotationY(const double t_angleRadians)
+{
+
+	MyMatrix3 rotation = {  cos(t_angleRadians), 0.0, sin(t_angleRadians),
+							0.0, 1.0, 0.0,
+						    -sin(t_angleRadians), 0.0, cos(t_angleRadians) };
+
+	return rotation;
+}
+
+
+/// <summary>
+/// Determines the matrix for counter-clockwise rotation about the X-axis
+/// </summary>
+/// <param name="t_angleRadians">Angle of rotation</param>
+/// <returns>Rotation matrix</returns>
+MyMatrix3 MyMatrix3::rotationX(const double t_angleRadians)
+{
+
+	MyMatrix3 rotation = {  1.0, 0.0, 0.0,
+							0.0, cos(t_angleRadians), -sin(t_angleRadians),
+							0.0, sin(t_angleRadians), cos(t_angleRadians) };
+
+	return rotation;
+}
