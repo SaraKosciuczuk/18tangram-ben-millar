@@ -12,69 +12,11 @@
 Game::Game() :
 	m_window{ sf::VideoMode{ 1000, 600 }, "SMFL Game" },
 	m_triangle{ sf::Triangles },
-	m_quad{ sf::Quads },
-	m_shapePoints{
-		 { 100.0,150.0, 1.0 }, // triangle 1
-		 { 200.0,250.0, 1.0 },
-		 { 300.0,150.0, 1.0 },
-		 { 300.0,150.0, 1.0 }, // triangle 2
-		 { 200.0,250.0, 1.0 },
-		 { 300.0,350.0, 1.0 },
-		 { 300.0,350.0, 1.0 }, // triangle 3
-		 { 200.0,350.0, 1.0 },
-		 { 250.0,300.0, 1.0 },
-	 	 { 200.0,350.0, 1.0 }, // triangle 4
-	 	 { 100.0,350.0, 1.0 },
-		 { 100.0,250.0, 1.0 },
-		 { 150.0,300.0, 1.0 }, // triangle 5
-		 { 200.0,250.0, 1.0 },
-		 { 150.0,200.0, 1.0 },
-		 { 150.0,200.0, 1.0 }, // quad 1
-		 { 100.0,150.0, 1.0 },
-		 { 100.0,250.0, 1.0 },
-		 { 150.0,300.0, 1.0 },
-		 { 150.0,300.0, 1.0 }, // quad 2
-		 { 200.0,350.0, 1.0 },
-		 { 250.0,300.0, 1.0 },
-		 { 200.0,250.0, 1.0 }
-
-}
-
-{
-	for (size_t i = 0; i < NO_POINTS; i++)
+	m_quad{ sf::Quads }
 	{
-		if (i >= 19)
-		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Blue };
-		}
-		else if ( i >= 15 )
-		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Cyan };
-		}
-		else if (i >= 12)
-		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Magenta };
-		}
-		else if (i >= 9)
-		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Yellow };
-		}
-		else if (i >= 6)
-		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Green };
-		}
-		else if (i >= 3)
-		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),CORNFLOWER_BLUE };
-		}
-		else
-		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Red };
-		}
+		setupShapes();
 	}
 
-	setupShapes();
-}
 
 /// <summary>
 /// Pete's game loop
@@ -127,28 +69,42 @@ void Game::processEvents()
 /// </summary>
 void Game::setupShapes()
 {
-	for (int shape = 0, point = 0; shape <= 4; shape++)
-	{
-		triangleShape[shape].A = m_shapePoints[point];
-		triangleShape[shape].B = m_shapePoints[point+1];
-		triangleShape[shape].C = m_shapePoints[point+2];
+	m_triangleShape[0].init_A = { 100.0,150.0, 1.0 }, // triangle 1
+	m_triangleShape[0].init_B = { 200.0,250.0, 1.0 },
+	m_triangleShape[0].init_C = { 300.0,150.0, 1.0 },
+	m_triangleShape[0].color = sf::Color::Cyan;
 
-		triangleShape[shape].OriginalPos = (triangleShape[shape].A + triangleShape[shape].B + triangleShape[shape].C) / 3.0;
+	m_triangleShape[1].init_A = { 300.0,150.0, 1.0 }, // triangle 2
+	m_triangleShape[1].init_B = { 200.0,250.0, 1.0 },
+	m_triangleShape[1].init_C = { 300.0,350.0, 1.0 },
+	m_triangleShape[1].color = sf::Color::Yellow;
 
-		point += 3;
-	}
+	m_triangleShape[2].init_A = { 300.0,350.0, 1.0 }, // triangle 3
+	m_triangleShape[2].init_B = { 200.0,350.0, 1.0 },
+	m_triangleShape[2].init_C = { 250.0,300.0, 1.0 },
+	m_triangleShape[2].color = sf::Color::Red;
 
-	for (int shape = 5, point = 0; shape <= 6; shape++)
-	{
-		quadShape[shape].A = m_shapePoints[point];
-		quadShape[shape].B = m_shapePoints[point + 1];
-		quadShape[shape].C = m_shapePoints[point + 2];
-		quadShape[shape].C = m_shapePoints[point + 3];
+	m_triangleShape[3].init_A = { 200.0,350.0, 1.0 }, // triangle 4
+	m_triangleShape[3].init_B = { 100.0,350.0, 1.0 },
+	m_triangleShape[3].init_C = { 100.0,250.0, 1.0 },
+	m_triangleShape[3].color = sf::Color::Magenta;
 
-		triangleShape[shape].OriginalPos = (triangleShape[shape].A + triangleShape[shape].B + triangleShape[shape].C) / 3;
+	m_triangleShape[4].init_A = { 150.0,300.0, 1.0 }, // triangle 5
+	m_triangleShape[4].init_B = { 200.0,250.0, 1.0 },
+	m_triangleShape[4].init_C = { 150.0,200.0, 1.0 },
+	m_triangleShape[4].color = sf::Color::Green;
 
-		point += 4;
-	}
+	m_quadShape[0].init_A = { 150.0,200.0, 1.0 }, // quad 1
+	m_quadShape[0].init_B = { 100.0,150.0, 1.0 },
+	m_quadShape[0].init_C = { 100.0,250.0, 1.0 },
+	m_quadShape[0].init_D = { 150.0,300.0, 1.0 },
+	m_quadShape[0].color = sf::Color::Blue;
+
+	m_quadShape[1].init_A = { 150.0,300.0, 1.0 }, // quad 2
+	m_quadShape[1].init_B = { 200.0,350.0, 1.0 },
+	m_quadShape[1].init_C = { 250.0,300.0, 1.0 },
+	m_quadShape[1].init_D = { 200.0,250.0, 1.0 },
+	m_quadShape[1].color = CORNFLOWER_BLUE;
 }
 
 /// <summary>
@@ -216,19 +172,31 @@ void Game::update(sf::Time t_deltaTime)
 	}
 	m_triangle.clear();
 	m_quad.clear();
-	for (int i = 0; i < NO_POINTS; i++)
+	for (int i = 0, j = 0; i < 5; i++)
 	{
-		if (i >= 15)
-		{
-			m_renderPoints[i].position = m_shapePoints[i];
-			m_quad.append(m_renderPoints[i]);
-		}
-		else
-		{
-			m_renderPoints[i].position = m_shapePoints[i];  // we could go straight from vector + colour
-			m_triangle.append(m_renderPoints[i]); // Pete didn't
-		}
+		m_renderPoints[j] = { m_triangleShape[i].current_A, m_triangleShape[i].color };
+		m_triangle.append(m_renderPoints[j]);
+		j++;
+		m_renderPoints[j] = { m_triangleShape[i].current_B, m_triangleShape[i].color };
+		m_triangle.append(m_renderPoints[j]);
+		j++;
+		m_renderPoints[j] = { m_triangleShape[i].current_C, m_triangleShape[i].color };
+		m_triangle.append(m_renderPoints[j]);
+		j++;
 	}
+	//for (int i = 0; i < NO_POINTS; i++)
+	//{
+	//	if (i >= 15)
+	//	{
+	//		m_renderPoints[i] = { m_triangleShape[i].current_A, m_triangleShape[i].color };
+	//		m_quad.append(m_renderPoints[i]);
+	//	}
+	//	else
+	//	{
+	//		m_renderPoints[i].position = m_shapePoints[i];  // we could go straight from vector + colour
+	//		m_triangle.append(m_renderPoints[i]); // Pete didn't
+	//	}
+	//}
 }
 
 

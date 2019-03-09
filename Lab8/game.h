@@ -17,16 +17,20 @@ const unsigned NO_POINTS = 23;
 
 struct triangleStruct
 {
-	MyVector3 A, B, C;
+	MyVector3 init_A, init_B, init_C;
 
-	MyVector3 OriginalPos; // center of the original shape
+	MyVector3 current_A, current_B, current_C;
+
+	sf::Color color;
 };
 
 struct quadShape
 {
-	MyVector3 A, B, C, D;
+	MyVector3 init_A, init_B, init_C, init_D;
 
-	MyVector3 OriginalPos; // center of the original shape
+	MyVector3 current_A, current_B, current_C, current_D;
+
+	sf::Color color;
 };
 
 class Game
@@ -59,8 +63,8 @@ private:
 
 	sf::RenderWindow m_window; 
 
-	triangleStruct triangleShape[5];
-	quadShape quadShape[2];
+	triangleStruct m_triangleShape[5];
+	quadShape m_quadShape[2];
 	
 	// +++++++++++++++++++++++++++++
 
