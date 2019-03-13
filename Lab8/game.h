@@ -16,6 +16,8 @@ const sf::Color GRAY{ 25,25,25,255 };
 const unsigned NO_POINTS = 23;
 const unsigned NO_SHAPES = 7;
 
+const unsigned NO_PUZZLES = 4;
+
 enum rotationDir
 {
 	clockwise = 1,
@@ -31,12 +33,14 @@ private:
 	// ++++++++++ METHODS ++++++++++
 	
 	void setupFontAndText();
+	void setupSprites();
 	void processEvents();
+	void resetShapes();
 	void update(sf::Time t_deltaTime);
 	static MyVector3 findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end);
 	static MyMatrix3 rotate(MyVector3 t_center, rotationDir t_direction);
 	void render();
-	void drawNumber(int t_number, int t_startRange, int t_endRange);
+	void drawNumber(int t_number, int t_start, int t_end);
 
 	// +++++++++++++++++++++++++++++
 
@@ -45,13 +49,16 @@ private:
 
 	sf::VertexArray m_triangle; // used to draw triangles
 	sf::VertexArray m_quad; // used to draw quads
+
+	const MyVector3 M_INITIAL_POSITIONS[NO_POINTS];
+
 	sf::Vertex m_renderPoints[NO_POINTS]; // used to store vertexs, especailly colour
 	MyVector3 m_shapePoints[NO_POINTS]; // used for game logic
 
 	float m_moveSpeed = 1.0f;
 
-	unsigned startRange = 0;
-	unsigned endRange = 3;
+	unsigned m_startRange = 0;
+	unsigned m_endRange = 3;
 
 	// +++++++++++++++++++++++++++++
 
@@ -62,6 +69,9 @@ private:
 
 	sf::Font m_arialBlackFont;
 	sf::Text m_numberText;
+
+	sf::Texture m_puzzleTextures[NO_PUZZLES];
+	sf::Sprite m_puzzleSprites[NO_PUZZLES];
 	
 	// +++++++++++++++++++++++++++++
 
