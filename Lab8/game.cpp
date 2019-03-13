@@ -42,7 +42,6 @@ Game::Game() :
 		 { 200.0,250.0, 1.0 }
 
 }
-
 {
 	for (size_t i = 0; i < NO_POINTS; i++)
 	{
@@ -75,6 +74,8 @@ Game::Game() :
 			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Red };
 		}
 	}
+
+	setupFontAndText();
 }
 
 /// <summary>
@@ -97,6 +98,21 @@ void Game::run()
 		}
 		render();
 	}
+}
+
+/// <summary>
+/// Set up font and text for the game
+/// </summary>
+void Game::setupFontAndText()
+{
+	if (!m_arialBlackFont.loadFromFile("ASSETS/FONTS/ariblk.ttf"))
+	{
+		std::cout << "Error loading arial black font, located at ASSETS/FONTS/ariblk.ttf" << std::endl;
+	}
+
+	m_numberText.setFont(m_arialBlackFont);
+	m_numberText.setFillColor(sf::Color::White);
+	m_numberText.setCharacterSize(18U);
 }
 
 /// <summary>
@@ -156,35 +172,49 @@ void Game::processEvents()
 /// <param name="t_deltaTime">frame time</param>
 void Game::update(sf::Time t_deltaTime)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ||
+		sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))
 	{
-		for (int i = startRange; i < endRange; i++)
+		m_moveSpeed = 3.0f;
+	}
+	else
+	{
+		m_moveSpeed = 1.0f;
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
+		sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	{
+		for (unsigned i = startRange; i < endRange; i++)
 		{
-			m_shapePoints[i] = MyMatrix3::translation({ 0.0,-1.0,0.0 }) * m_shapePoints[i];
+			m_shapePoints[i] = MyMatrix3::translation({ 0.0,-m_moveSpeed,0.0 }) * m_shapePoints[i];
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) ||
+		sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		for (int i = startRange; i < endRange; i++)
+		for (unsigned i = startRange; i < endRange; i++)
 		{
-			m_shapePoints[i] = MyMatrix3::translation({ 0.0,1.0,0.0 }) * m_shapePoints[i];
+			m_shapePoints[i] = MyMatrix3::translation({ 0.0,m_moveSpeed,0.0 }) * m_shapePoints[i];
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) ||
+		sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		for (int i = startRange; i < endRange; i++)
+		for (unsigned i = startRange; i < endRange; i++)
 		{
-			m_shapePoints[i] = MyMatrix3::translation({ -1.0,0.0,0.0 }) * m_shapePoints[i];
+			m_shapePoints[i] = MyMatrix3::translation({ -m_moveSpeed,0.0,0.0 }) * m_shapePoints[i];
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) ||
+		sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		for (int i = startRange; i < endRange; i++)
+		for (unsigned i = startRange; i < endRange; i++)
 		{
-			m_shapePoints[i] = MyMatrix3::translation({ 1.0,0.0,0.0 }) * m_shapePoints[i];
+			m_shapePoints[i] = MyMatrix3::translation({ m_moveSpeed,0.0,0.0 }) * m_shapePoints[i];
 		}
 	}
 
@@ -193,7 +223,7 @@ void Game::update(sf::Time t_deltaTime)
 		MyVector3 center = Game::findCenter(m_shapePoints, startRange, endRange);
 		MyMatrix3 rotation = Game::rotate(center, counterclockwise);
 
-		for (int i = startRange; i < endRange; i++)
+		for (unsigned i = startRange; i < endRange; i++)
 		{
 			m_shapePoints[i] = rotation * m_shapePoints[i];
 		}
@@ -204,7 +234,7 @@ void Game::update(sf::Time t_deltaTime)
 		MyVector3 center = Game::findCenter(m_shapePoints, startRange, endRange);
 		MyMatrix3 rotation = Game::rotate(center, clockwise);
 		
-		for (int i = startRange; i < endRange; i++)
+		for (unsigned i = startRange; i < endRange; i++)
 		{
 			m_shapePoints[i] = rotation * m_shapePoints[i];
 		}
@@ -212,7 +242,7 @@ void Game::update(sf::Time t_deltaTime)
 
 	m_triangle.clear();
 	m_quad.clear();
-	for (int i = 0; i < NO_POINTS; i++)
+	for (unsigned i = 0; i < NO_POINTS; i++)
 	{
 		if (i >= 15)
 		{
@@ -239,7 +269,7 @@ MyVector3 Game::findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end
 	MyVector3 sum = { 0.0,0.0,0.0 }, result = { 0.0,0.0,0.0 };
 	double range = t_end - t_start;
 
-	for (int i = t_start; i < t_end; i++)
+	for (unsigned i = t_start; i < t_end; i++)
 	{
 		sum += t_array[i];
 	}
@@ -269,5 +299,21 @@ void Game::render()
 	m_window.clear();
 	m_window.draw(m_triangle);
 	m_window.draw(m_quad);
+	
+	drawNumber(1, 0, 3);
+	drawNumber(2, 4, 7);
+	drawNumber(3, 8, 11);
+	drawNumber(1, 0, 3);
+	drawNumber(1, 0, 3);
+	drawNumber(1, 0, 3);
+	drawNumber(1, 0, 3);
+
 	m_window.display();
+}
+
+void Game::drawNumber(int t_number, int t_startRange, int t_endRange)
+{
+	m_numberText.setString(std::to_string(t_number));
+	m_numberText.setPosition(Game::findCenter(m_shapePoints, t_startRange, t_endRange));
+	m_window.draw(m_numberText);
 }

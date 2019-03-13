@@ -14,6 +14,7 @@
 const sf::Color CORNFLOWER_BLUE{ 154, 206, 235, 255 };
 const sf::Color GRAY{ 25,25,25,255 };
 const unsigned NO_POINTS = 23;
+const unsigned NO_SHAPES = 7;
 
 enum rotationDir
 {
@@ -29,11 +30,13 @@ public:
 private:
 	// ++++++++++ METHODS ++++++++++
 	
+	void setupFontAndText();
 	void processEvents();
 	void update(sf::Time t_deltaTime);
 	static MyVector3 findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end);
 	static MyMatrix3 rotate(MyVector3 t_center, rotationDir t_direction);
 	void render();
+	void drawNumber(int t_number, int t_startRange, int t_endRange);
 
 	// +++++++++++++++++++++++++++++
 
@@ -45,6 +48,8 @@ private:
 	sf::Vertex m_renderPoints[NO_POINTS]; // used to store vertexs, especailly colour
 	MyVector3 m_shapePoints[NO_POINTS]; // used for game logic
 
+	float m_moveSpeed = 1.0f;
+
 	unsigned startRange = 0;
 	unsigned endRange = 3;
 
@@ -54,6 +59,9 @@ private:
 	// ++++++++++ OBJECTS ++++++++++
 
 	sf::RenderWindow m_window; 
+
+	sf::Font m_arialBlackFont;
+	sf::Text m_numberText;
 	
 	// +++++++++++++++++++++++++++++
 
