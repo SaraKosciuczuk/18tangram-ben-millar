@@ -15,18 +15,10 @@ const sf::Color CORNFLOWER_BLUE{ 154, 206, 235, 255 };
 const sf::Color GRAY{ 25,25,25,255 };
 const unsigned NO_POINTS = 23;
 
-struct triangleStruct
+enum rotationDir
 {
-	MyVector3 A, B, C;
-
-	MyVector3 OriginalPos; // center of the original shape
-};
-
-struct quadShape
-{
-	MyVector3 A, B, C, D;
-
-	MyVector3 OriginalPos; // center of the original shape
+	clockwise = 1,
+	counterclockwise = -1
 };
 
 class Game
@@ -38,8 +30,9 @@ private:
 	// ++++++++++ METHODS ++++++++++
 	
 	void processEvents();
-	void setupShapes();
 	void update(sf::Time t_deltaTime);
+	static MyVector3 findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end);
+	static MyMatrix3 rotate(MyVector3 t_center, rotationDir t_direction);
 	void render();
 
 	// +++++++++++++++++++++++++++++
@@ -52,15 +45,15 @@ private:
 	sf::Vertex m_renderPoints[NO_POINTS]; // used to store vertexs, especailly colour
 	MyVector3 m_shapePoints[NO_POINTS]; // used for game logic
 
+	unsigned startRange = 0;
+	unsigned endRange = 3;
+
 	// +++++++++++++++++++++++++++++
 
 
 	// ++++++++++ OBJECTS ++++++++++
 
 	sf::RenderWindow m_window; 
-
-	triangleStruct triangleShape[5];
-	quadShape quadShape[2];
 	
 	// +++++++++++++++++++++++++++++
 

@@ -2,7 +2,10 @@
 /// Author: Ben Millar – C00236772
 /// Date: 28/02/2019
 /// Estimated time to complete: 12 hours
-/// Session 1 Start: 22:50 End: 23:10 02/03/2019
+/// Session 1 Start: 22:50 End: 23:10 
+/// Session 2 Start: 14:00 End: 15:00
+/// Session 3 Start: 09:00 End: 10:20 
+/// Session 4 Start: 12:30 End: 13:20 TOTAL TIME: 3:30
 /// </summary>
 
 #include "Game.h"
@@ -72,8 +75,6 @@ Game::Game() :
 			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Red };
 		}
 	}
-
-	setupShapes();
 }
 
 /// <summary>
@@ -118,48 +119,46 @@ void Game::processEvents()
 			{
 				m_window.close();
 			}
+
+			switch (event.key.code)
+			{
+			case sf::Keyboard::Num1:
+				startRange = 0, endRange = 3;
+				break;
+			case sf::Keyboard::Num2:
+				startRange = 3, endRange = 6;
+				break;
+			case sf::Keyboard::Num3:
+				startRange = 6, endRange = 9;
+				break;
+			case sf::Keyboard::Num4:
+				startRange = 9, endRange = 12;
+				break;
+			case sf::Keyboard::Num5:
+				startRange = 12, endRange = 15;
+				break;
+			case sf::Keyboard::Num6:
+				startRange = 15, endRange = 19;
+				break;
+			case sf::Keyboard::Num7:
+				startRange = 19, endRange = 23;
+				break;
+			default:
+				break;
+			}
 		}
 	}
 }
 
 /// <summary>
-/// 
-/// </summary>
-void Game::setupShapes()
-{
-	for (int shape = 0, point = 0; shape <= 4; shape++)
-	{
-		triangleShape[shape].A = m_shapePoints[point];
-		triangleShape[shape].B = m_shapePoints[point+1];
-		triangleShape[shape].C = m_shapePoints[point+2];
-
-		triangleShape[shape].OriginalPos = (triangleShape[shape].A + triangleShape[shape].B + triangleShape[shape].C) / 3.0;
-
-		point += 3;
-	}
-
-	for (int shape = 5, point = 0; shape <= 6; shape++)
-	{
-		quadShape[shape].A = m_shapePoints[point];
-		quadShape[shape].B = m_shapePoints[point + 1];
-		quadShape[shape].C = m_shapePoints[point + 2];
-		quadShape[shape].C = m_shapePoints[point + 3];
-
-		triangleShape[shape].OriginalPos = (triangleShape[shape].A + triangleShape[shape].B + triangleShape[shape].C) / 3;
-
-		point += 4;
-	}
-}
-
-/// <summary>
-/// respond to keyinputs and update vertex array to new vector popsitions
+/// respond to keyinputs and update vertex array to new vector positions
 /// </summary>
 /// <param name="t_deltaTime">frame time</param>
 void Game::update(sf::Time t_deltaTime)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = startRange; i < endRange; i++)
 		{
 			m_shapePoints[i] = MyMatrix3::translation({ 0.0,-1.0,0.0 }) * m_shapePoints[i];
 		}
@@ -167,7 +166,7 @@ void Game::update(sf::Time t_deltaTime)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = startRange; i < endRange; i++)
 		{
 			m_shapePoints[i] = MyMatrix3::translation({ 0.0,1.0,0.0 }) * m_shapePoints[i];
 		}
@@ -175,7 +174,7 @@ void Game::update(sf::Time t_deltaTime)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = startRange; i < endRange; i++)
 		{
 			m_shapePoints[i] = MyMatrix3::translation({ -1.0,0.0,0.0 }) * m_shapePoints[i];
 		}
@@ -183,37 +182,34 @@ void Game::update(sf::Time t_deltaTime)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = startRange; i < endRange; i++)
 		{
 			m_shapePoints[i] = MyMatrix3::translation({ 1.0,0.0,0.0 }) * m_shapePoints[i];
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 	{
+		MyVector3 center = Game::findCenter(m_shapePoints, startRange, endRange);
+		MyMatrix3 rotation = Game::rotate(center, counterclockwise);
+
+		for (int i = startRange; i < endRange; i++)
+		{
+			m_shapePoints[i] = rotation * m_shapePoints[i];
+		}
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+	{
+		MyVector3 center = Game::findCenter(m_shapePoints, startRange, endRange);
+		MyMatrix3 rotation = Game::rotate(center, clockwise);
 		
-		for (int i = 0; i < 3; i++)
+		for (int i = startRange; i < endRange; i++)
 		{
-			MyVector3 originalPos = m_shapePoints[i];
-			MyMatrix3 transformation = MyMatrix3::translation(-originalPos);
-			m_shapePoints[i] = transformation * m_shapePoints[i];
-
-			// I'm moving each point to the origin
-			std::cout << "Original: " << originalPos.toString() << std::endl;
-			std::cout << "Transformation: " << transformation.toString() << std::endl;
-			std::cout << "New pos: " << m_shapePoints[i].toString() << std::endl;
-			//MyMatrix3::rotationZ(3.14159 / 180.0)
-			//m_shapePoints[i] = MyMatrix3::translation(originalPos) * originalPos;
+			m_shapePoints[i] = rotation * m_shapePoints[i];
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-	{
-		for (int i = 0; i < 3; i++)
-		{
-			m_shapePoints[i] = MyMatrix3::rotationZ(-3.14159 / 180.0) * m_shapePoints[i];
-		}
-	}
 	m_triangle.clear();
 	m_quad.clear();
 	for (int i = 0; i < NO_POINTS; i++)
@@ -231,9 +227,42 @@ void Game::update(sf::Time t_deltaTime)
 	}
 }
 
+/// <summary>
+/// Determines the center of a shape given its points
+/// </summary>
+/// <param name="t_array">array of points</param>
+/// <param name="t_start">start point in array</param>
+/// <param name="t_end">end point in array</param>
+/// <returns>location of the center as a MyVector3</returns>
+MyVector3 Game::findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end)
+{
+	MyVector3 sum = { 0.0,0.0,0.0 }, result = { 0.0,0.0,0.0 };
+	double range = t_end - t_start;
+
+	for (int i = t_start; i < t_end; i++)
+	{
+		sum += t_array[i];
+	}
+
+	result = sum / range;
+	return result;
+}
 
 /// <summary>
-/// draw the screen just a 
+/// Generates a matrix to translate a point to the origin, rotate it, and return it to its original position with its new rotation
+/// </summary>
+/// <param name="t_center">center of rotation</param>
+/// <param name="t_direction">direction of rotation</param>
+/// <returns>transformation matrix</returns>
+MyMatrix3 Game::rotate(MyVector3 t_center, rotationDir t_direction)
+{
+	MyMatrix3 result = MyMatrix3::translation(t_center) * MyMatrix3::rotationZ((3.14159 / 180.0) * t_direction) * MyMatrix3::translation(-t_center);
+
+	return result;
+}
+
+/// <summary>
+/// draw a frame, and then switch buffers
 /// </summary>
 void Game::render()
 {

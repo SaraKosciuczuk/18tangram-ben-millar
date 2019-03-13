@@ -179,31 +179,23 @@ MyVector3 MyVector3::operator/(const double t_divisor) const
 /// <summary>
 /// overload for += in-place incrementation operator
 /// </summary>
-MyVector3 MyVector3::operator+=(const MyVector3 t_right)
+void MyVector3::operator+=(const MyVector3 t_right)
 {
-	MyVector3 newVector = { x, y, z }; // assigned values of left operand via 'this' pointer
-
 // add each element of the vector in turn
-	newVector.x += t_right.x;
-	newVector.y += t_right.y;
-	newVector.z += t_right.z;
-
-	return newVector;
+	x += t_right.x;
+	y += t_right.y;
+	z += t_right.z;
 }
 
 /// <summary>
 /// overload for -= in-place decrementation operator
 /// </summary>
-MyVector3 MyVector3::operator-=(const MyVector3 t_right)
+void MyVector3::operator-=(const MyVector3 t_right)
 {
-	MyVector3 newVector{ x, y, z }; // assigned values of left operand via 'this' pointer
-
 // subtract each element of the RH operand from the LH operand in turn
-	newVector.x -= t_right.x;
-	newVector.y -= t_right.y;
-	newVector.z -= t_right.z;
-
-	return newVector;
+	x -= t_right.x;
+	y -= t_right.y;
+	z -= t_right.z;
 }
 
 /// <summary>

@@ -52,8 +52,8 @@ public:
 	MyVector3 operator /(const double t_divisor) const; // overload * operator to divide 3D vectors by a single divisor
 
 	// We are changing the value on the left, so it is not a constant
-	MyVector3 operator +=(const MyVector3 t_right); // overload += operator for in-place addition of 3D vectors
-	MyVector3 operator -=(const MyVector3 t_right); // overload -= operator for in-place subtraction of 3D vectors
+	void operator +=(const MyVector3 t_right); // overload += operator for in-place addition of 3D vectors
+	void operator -=(const MyVector3 t_right); // overload -= operator for in-place subtraction of 3D vectors
 
 	// Check for equality/inequality overloads
 	bool operator == (const MyVector3 t_right) const; // overload == operator to check equality of 3D vectors
