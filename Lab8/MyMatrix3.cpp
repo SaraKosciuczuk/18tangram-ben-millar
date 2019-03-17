@@ -32,7 +32,7 @@ MyMatrix3::MyMatrix3()
 }
 
 /// <summary>
-/// Constructor for MyMatrix3 taking in NINE doubles.
+/// Constructor for MyMatrix3 taking in NINE doubles.					
 /// </summary>
 MyMatrix3::MyMatrix3(double t_a11, double t_a12, double t_a13, double t_a21, double t_a22, double t_a23, double t_a31, double t_a32, double t_a33)
 {

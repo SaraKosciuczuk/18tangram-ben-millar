@@ -8,7 +8,10 @@
 /// Session 4 Start: 12:30 End: 13:20 
 /// Session 5 Start: 12:20 End: 13:00
 /// Session 6 Start: 21:55 End: 22:10
-/// Session 7 Start: 23:00 End: 23:45 TOTAL TIME: 5 hours 10 minutes
+/// Session 7 Start: 23:00 End: 23:45
+/// Session 8 Start: 09:10 End: 09:45
+/// Session 9 Start: 16:20 End: 17:10
+/// Session 10 Start: 16:00 End: 16:50 TOTAL TIME: 7 hours 25 minutes
 /// </summary>
 
 #include "Game.h"
@@ -19,6 +22,7 @@ Game::Game() :
 	m_window{ sf::VideoMode{ 1000, 600 }, "SMFL Game" },
 	m_triangle{ sf::Triangles },
 	m_quad{ sf::Quads },
+	m_highlight{ sf::Lines },
 	M_INITIAL_POSITIONS{
 		 { 100.0,150.0, 1.0 }, // triangle 1
 		 { 200.0,250.0, 1.0 },
@@ -45,41 +49,49 @@ Game::Game() :
 		 { 200.0,250.0, 1.0 }
 }
 {
+	// initialise all vertex points
 	for (size_t i = 0; i < NO_POINTS; i++)
 	{
 		if (i >= 19)
 		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Blue };
+			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::White };
 		}
 		else if ( i >= 15 )
 		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Cyan };
+			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::White };
 		}
 		else if (i >= 12)
 		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Magenta };
+			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::White };
 		}
 		else if (i >= 9)
 		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Yellow };
+			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::White };
 		}
 		else if (i >= 6)
 		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Green };
+			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::White };
 		}
 		else if (i >= 3)
 		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),CORNFLOWER_BLUE };
+			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::White };
 		}
 		else
 		{
-			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::Red };
+			m_renderPoints[i] = sf::Vertex{ sf::Vector2f(m_shapePoints[i]),sf::Color::White };
 		}
+	}
+
+	// set up vertex points for our white 'highlight'
+	for (int i = 0; i < 8; i++)
+	{
+		m_highlightRenderPoints[i].color = sf::Color::White;
 	}
 
 	resetShapes();
 	setupFontAndText();
 	setupSprites();
+	setupObjects();
 }
 
 /// <summary>
@@ -115,8 +127,15 @@ void Game::setupFontAndText()
 	}
 
 	m_numberText.setFont(m_arialBlackFont);
-	m_numberText.setFillColor(sf::Color::White);
+	m_numberText.setFillColor(sf::Color::Black);
 	m_numberText.setCharacterSize(18U);
+
+	m_UItext.setFont(m_arialBlackFont);
+	m_UItext.setFillColor(sf::Color(255,255,255,220));
+	m_UItext.setPosition({ 10.0f,10.0f });
+	m_UItext.setCharacterSize(20U);
+
+	m_UItext.setString("Hold [I] to see instructions.");
 
 }
 
@@ -125,31 +144,58 @@ void Game::setupFontAndText()
 /// </summary>
 void Game::setupSprites()
 {
-	if (!m_puzzleTextures[0].loadFromFile("ASSETS//IMAGES//PUZZLE1.png"))
+	// load puzzle textures
+	if (!m_puzzleTextures[0].loadFromFile("ASSETS//IMAGES//PUZZLE2.png"))
 	{
-		std::cout << "Error loading PUZZLE1 texture, located at ASSETS//IMAGES//PUZZLE1.png";
+		std::cout << "Error loading PUZZLE1 texture, located at ASSETS//IMAGES//PUZZLE2.png" << std::endl;
 	}
 
-	if (!m_puzzleTextures[1].loadFromFile("ASSETS//IMAGES//PUZZLE2.png"))
+	if (!m_puzzleTextures[1].loadFromFile("ASSETS//IMAGES//PUZZLE2_Solution.png"))
 	{
-		std::cout << "Error loading PUZZLE2 texture, located at ASSETS//IMAGES//PUZZLE2.png";
+		std::cout << "Error loading PUZZLE2 texture, located at ASSETS//IMAGES//PUZZLE2_Solution.png" << std::endl;
 	}
 
-	if (!m_puzzleTextures[2].loadFromFile("ASSETS//IMAGES//PUZZLE3.png"))
+
+	// assign puzzles texture
+	m_puzzleSprite.setTexture(m_puzzleTextures[0]);
+	m_puzzleSprite.setPosition({ 500.0f,130.0f });
+
+
+	// load wood textures
+	if (!m_woodTextures[0].loadFromFile("ASSETS//IMAGES//woodTexture0.png"))
 	{
-		std::cout << "Error loading PUZZLE3 texture, located at ASSETS//IMAGES//PUZZLE3.png";
+		std::cout << "Error loading woodTexture0 texture, located at ASSETS//IMAGES//woodTexture0.png" << std::endl;
+	}
+	if (!m_woodTextures[1].loadFromFile("ASSETS//IMAGES//woodTexture1.png"))
+	{
+		std::cout << "Error loading woodTexture1 texture, located at ASSETS//IMAGES//woodTexture1.png" << std::endl;
+	}
+	if (!m_woodTextures[2].loadFromFile("ASSETS//IMAGES//woodTexture2.png"))
+	{
+		std::cout << "Error loading woodTexture2 texture, located at ASSETS//IMAGES//woodTexture2.png" << std::endl;
+	}
+	if (!m_woodTextures[3].loadFromFile("ASSETS//IMAGES//woodTexture3.png"))
+	{
+		std::cout << "Error loading woodTexture3 texture, located at ASSETS//IMAGES//woodTexture3.png" << std::endl;
 	}
 
-	if (!m_puzzleTextures[3].loadFromFile("ASSETS//IMAGES//PUZZLE4.png"))
+	// load instructions texture
+	if (!m_instructionsTexture.loadFromFile("ASSETS//IMAGES//instructions.png"))
 	{
-		std::cout << "Error loading PUZZLE4 texture, located at ASSETS//IMAGES//PUZZLE4.png";
+		std::cout << "Error loading instructions texture, located at ASSETS//IMAGES//instructions.png" << std::endl;
 	}
 
-	for (int i = 0; i < NO_PUZZLES; i++)
-	{
-		m_puzzleSprites[i].setTexture(m_puzzleTextures[i]);
-		m_puzzleSprites[i].setPosition({ 500.0f,130.0f });
-	}
+	m_instructionsSprite.setTexture(m_instructionsTexture);
+}
+
+/// <summary>
+/// Sets up all SFML objects
+/// </summary>
+void Game::setupObjects()
+{
+	m_resetBar.setPosition(10.0f, 570.0f);
+	m_resetBar.setFillColor(sf::Color::Red);
+	m_resetBar.setSize({ 200.0f,20.0f });
 }
 
 /// <summary>
@@ -173,6 +219,7 @@ void Game::processEvents()
 				m_window.close();
 			}
 
+			// select the range of points to transform
 			switch (event.key.code)
 			{
 			case sf::Keyboard::Num1:
@@ -196,17 +243,28 @@ void Game::processEvents()
 			case sf::Keyboard::Num7:
 				m_startRange = 19, m_endRange = 23;
 				break;
+			case sf::Keyboard::R:
+				if (m_resetting == false)
+				{
+					m_resetting = true;
+					m_resetClock.restart();
+				}
+				break;
 			default:
 				break;
 			}
 		}
 
+		// check for key release events
 		if (event.type == sf::Event::KeyReleased)
 		{
 			switch(event.key.code)
 			{
 			case sf::Keyboard::R:
-				resetShapes();
+				if (m_resetting == true)
+				{
+					m_resetting = false;
+				}
 				break;
 			default:
 				break;
@@ -222,9 +280,14 @@ void Game::resetShapes()
 {
 	for (int i = 0; i < NO_POINTS; i++)
 	{
-		m_shapePoints[i] = M_INITIAL_POSITIONS[i];
+		m_shapePoints[i] = M_INITIAL_POSITIONS[i]; // reset point coords to their original
+		m_renderPoints[i].texCoords = m_shapePoints[i]; // setup texture coords
 	}
+
+	// cycle through our 4 wood textures
+	m_chosenTexture = ++m_chosenTexture % 4;
 }
+
 
 /// <summary>
 /// respond to keyinputs and update vertex array to new vector positions
@@ -232,6 +295,34 @@ void Game::resetShapes()
 /// <param name="t_deltaTime">frame time</param>
 void Game::update(sf::Time t_deltaTime)
 {
+	// ++++++++++ RESET SHAPES ++++++++++
+	if (m_resetting == true && m_resetClock.getElapsedTime() > m_resetTime)
+	{
+		resetShapes();
+		m_resetting = false;
+	}
+
+	// ++++++++ SHOW INSTRUCTIONS ++++++++
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::I))
+	{
+		m_showInstructions = true;
+	}
+	else
+	{
+		m_showInstructions = false;
+	}
+
+	// ++++++++++ SHOW SOLUTION ++++++++++
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Tab))
+	{
+		m_puzzleSprite.setTexture(m_puzzleTextures[1]);
+	}
+	else
+	{
+		m_puzzleSprite.setTexture(m_puzzleTextures[0]);
+	}
+
+
 	// ++++++++++ TAKE USER INPUT ++++++++++
 
 	// +++++++ SPEED UP MOVEMENT +++++++
@@ -293,7 +384,7 @@ void Game::update(sf::Time t_deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 	{
 		MyVector3 center = Game::findCenter(m_shapePoints, m_startRange, m_endRange);
-		MyMatrix3 rotation = Game::rotate(center, counterclockwise);
+		MyMatrix3 rotation = Game::rotate(center, rotationDir::counterclockwise);
 
 		for (unsigned i = m_startRange; i < m_endRange; i++)
 		{
@@ -306,7 +397,7 @@ void Game::update(sf::Time t_deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
 	{
 		MyVector3 center = Game::findCenter(m_shapePoints, m_startRange, m_endRange);
-		MyMatrix3 rotation = Game::rotate(center, clockwise);
+		MyMatrix3 rotation = Game::rotate(center, rotationDir::clockwise);
 		
 		for (unsigned i = m_startRange; i < m_endRange; i++)
 		{
@@ -316,26 +407,50 @@ void Game::update(sf::Time t_deltaTime)
 
 	// ++++++++++ END USER INPUT ++++++++++
 
-
+	// clear vertex arrays
 	m_triangle.clear();
 	m_quad.clear();
+	m_highlight.clear();
+
+	// for all points
 	for (unsigned i = 0; i < NO_POINTS; i++)
 	{
 		if (i >= 15)
 		{
+			// append points to quads
 			m_renderPoints[i].position = m_shapePoints[i];
 			m_quad.append(m_renderPoints[i]);
 		}
 		else
 		{
-			m_renderPoints[i].position = m_shapePoints[i];  // we could go straight from vector + colour
-			m_triangle.append(m_renderPoints[i]); // Pete didn't
+			// append points to triangles
+			m_renderPoints[i].position = m_shapePoints[i];
+			m_triangle.append(m_renderPoints[i]);
 		}
+	}
+
+	// Draw our highlight lines around chosen shape
+	for (unsigned i = 0, j = m_startRange; i < (m_endRange-m_startRange)*2; i++) // loop for num points * 2
+	{
+		if (i == 5) // if this is our last point
+		{
+			// link back to the starting point
+			m_highlightRenderPoints[i].position = m_shapePoints[m_startRange];
+		}
+		else
+		{
+			// otherwise set position equal to point[j] and assign to our vertex array
+			m_highlightRenderPoints[i].position = m_shapePoints[j];
+			m_highlight.append(m_highlightRenderPoints[i]);
+		}
+
+		// update j only every second point, as consecutive lines share a start/end point
+		if (i % 2 == 0) j++;
 	}
 }
 
 /// <summary>
-/// Determines the center of a shape given its points
+/// Determines the geometric center of a shape given its points
 /// </summary>
 /// <param name="t_array">array of points</param>
 /// <param name="t_start">start point in array</param>
@@ -363,7 +478,7 @@ MyVector3 Game::findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end
 /// <returns>transformation matrix</returns>
 MyMatrix3 Game::rotate(MyVector3 t_center, rotationDir t_direction)
 {
-	MyMatrix3 result = MyMatrix3::translation(t_center) * MyMatrix3::rotationZ((3.14159 / 180.0) * t_direction) * MyMatrix3::translation(-t_center);
+	MyMatrix3 result = MyMatrix3::translation(t_center) * MyMatrix3::rotationZ((3.14159 / 180.0) * int(t_direction)) * MyMatrix3::translation(-t_center);
 
 	return result;
 }
@@ -375,25 +490,47 @@ void Game::render()
 {
 	m_window.clear();
 
-	m_window.draw(m_puzzleSprites[0]);
-	m_window.draw(m_triangle);
-	m_window.draw(m_quad);
+	// draw puzzle
+	m_window.draw(m_puzzleSprite);
+
+	// draw shapes with texture
+	m_window.draw(m_triangle, &m_woodTextures[m_chosenTexture]);
+	m_window.draw(m_quad, &m_woodTextures[m_chosenTexture]);
+	m_window.draw(m_highlight);
 
 	// for all shapes
-	for (int shape = 1, startRange = 0, endRange = 3; shape < 8; shape++)
+	for (int shape = 1, start = 0, end = 3; shape < 8; shape++)
 	{
-		drawNumber(shape, startRange, endRange);
+		// if shape highlighted, draw white text. Otherwise, draw black
+		m_numberText.setFillColor((start == m_startRange) ? sf::Color::White : sf::Color::Black);
+
+		// pass off parameters to draw number
+		drawNumber(shape, start, end);
 
 		// if it's a triangle, increment by 3. If it's a quad, increment by 4
-		startRange += (shape < 6) ? 3 : 4;
-		endRange += (shape < 6) ? 3 : 4;
+		start += (shape < 6) ? 3 : 4;
+		end += (shape < 6) ? 3 : 4;
+	}
+
+	if (m_resetting == true)
+	{
+		drawResetBar();
+	}
+
+	if (m_showInstructions == true)
+	{
+		m_window.draw(m_instructionsSprite);
+	}
+	else
+	{
+		m_window.draw(m_UItext);
 	}
 
 	m_window.display();
 }
 
 /// <summary>
-/// Finds the center point of each shape, and draws its number there
+/// Draws the number of each shape over it's geometric center, plus an offset
 /// </summary>
 /// <param name="t_number">Number to draw on shape</param>
 /// <param name="t_start">Start range of points to find center</param>
@@ -407,4 +544,25 @@ void Game::drawNumber(int t_number, int t_start, int t_end)
 	m_numberText.setPosition(center + offset);
 
 	m_window.draw(m_numberText);
+}
+
+/// <summary>
+/// Draws and animates 'reset' bar on-screen
+/// </summary>
+void Game::drawResetBar()
+{
+	m_resetBar.setFillColor(sf::Color(0, 0, 0, 0));
+	m_resetBar.setOutlineColor(sf::Color::White);
+	m_resetBar.setOutlineThickness(2.0f);
+	m_resetBar.setSize({ 204.0f, 24.0f });
+	m_resetBar.setPosition({ 8.0f, 568.0f });
+
+	m_window.draw(m_resetBar);
+
+	m_resetBar.setFillColor(sf::Color::Red);
+	m_resetBar.setOutlineColor(sf::Color(0, 0, 0, 0));
+	m_resetBar.setSize({ (200.0f * m_resetClock.getElapsedTime().asSeconds()) ,20.0f }); // set to be equal to 100
+	m_resetBar.setPosition({ 10.0f, 570.0f });
+
+	m_window.draw(m_resetBar);
 }
