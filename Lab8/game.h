@@ -2,14 +2,34 @@
 /// Author: Ben Millar – C00236772
 /// Date: 28/02/2019
 /// Estimated time to complete: 12 hours
-/// Session 1 Start: 22:50 End: 23:10 02/03/2019
+/// Session 1 Start: 22:50 End: 23:10 
+/// Session 2 Start: 14:00 End: 15:00
+/// Session 3 Start: 09:00 End: 10:20 
+/// Session 4 Start: 12:30 End: 13:20 
+/// Session 5 Start: 12:20 End: 13:00
+/// Session 6 Start: 21:55 End: 22:10
+/// Session 7 Start: 23:00 End: 23:45
+/// Session 8 Start: 09:10 End: 09:45
+/// Session 9 Start: 16:20 End: 17:10
+/// Session 10 Start: 16:00 End: 16:50
+/// Session 11 Start: 17:40 End: 18:00 TOTAL TIME: 7 hours 45 minutes
 /// </summary>
+/// 
+/// KNOWN BUGS: I can't get the 'highlight' vertex lines to draw around the entire shape, only all but one.
+/// 
+/// MUSIC: Cottages Kevin MacLeod (incompetech.com)
+///	Licensed under Creative Commons : By Attribution 3.0 License
+///	http ://creativecommons.org/licenses/by/3.0/
+
+
 #ifndef GAME_H
 #define GAME_H
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "MyVector3.h"
 #include "MyMatrix3.h"
+
 
 // global constants
 
@@ -37,17 +57,18 @@ private:
 
 	// ++++++++++ METHODS ++++++++++
 	
-	void setupFontAndText();
-	void setupSprites();
-	void setupObjects();
-	void processEvents();
-	void resetShapes();
-	void update(sf::Time t_deltaTime);
-	static MyVector3 findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end);
-	static MyMatrix3 rotate(MyVector3 t_center, rotationDir t_direction);
-	void render();
-	void drawNumber(int t_number, int t_start, int t_end);
-	void drawResetBar();
+	void setupFontAndText(); // set up font
+	void setupSprites(); // load in and setup sprites
+	void setupObjects(); // set up SFML objects
+	void setupSounds(); // load in an initialise sounds/music
+	void processEvents(); // process user input
+	void resetShapes(); // return shapes to their starting position
+	void update(sf::Time t_deltaTime); // main update loop for game logic
+	static MyVector3 findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end); // finds the geometric center of a shape
+	static MyMatrix3 rotate(MyVector3 t_center, rotationDir t_direction); // rotates a shape in a given direction by 1 degree
+	void render(); // clear frame, render new framebuffer, and flip buffers
+	void drawNumber(int t_number, int t_start, int t_end); // draws number text onto shape
+	void drawResetBar(); // draws the reset 'loading' bar when resetting
 
 	// +++++++++++++++++++++++++++++
 
@@ -102,11 +123,15 @@ private:
 	// clock for timing shape reset delay
 	sf::Clock m_resetClock;
 	sf::Time m_resetTime = sf::seconds(1.0f);
-
 	sf::RectangleShape m_resetBar;
+
+	// sounds/music
+	sf::SoundBuffer m_clickBuffer;
+	sf::Sound m_clickSound;
+
+	sf::Music m_backgroundMusic;
 	
 	// +++++++++++++++++++++++++++++
-
 };
 
 #endif // !GAME_H

@@ -11,8 +11,15 @@
 /// Session 7 Start: 23:00 End: 23:45
 /// Session 8 Start: 09:10 End: 09:45
 /// Session 9 Start: 16:20 End: 17:10
-/// Session 10 Start: 16:00 End: 16:50 TOTAL TIME: 7 hours 25 minutes
+/// Session 10 Start: 16:00 End: 16:50
+/// Session 11 Start: 17:40 End: 18:00 TOTAL TIME: 7 hours 45 minutes
 /// </summary>
+/// 
+/// KNOWN BUGS: I can't get the 'highlight' vertex lines to draw around the entire shape, only all but one.
+/// 
+/// MUSIC: Cottages Kevin MacLeod (incompetech.com)
+///	Licensed under Creative Commons : By Attribution 3.0 License
+///	http ://creativecommons.org/licenses/by/3.0/
 
 #include "Game.h"
 #include <iostream>
@@ -92,6 +99,7 @@ Game::Game() :
 	setupFontAndText();
 	setupSprites();
 	setupObjects();
+	setupSounds();
 }
 
 /// <summary>
@@ -199,6 +207,28 @@ void Game::setupObjects()
 }
 
 /// <summary>
+/// Sets up all SFML audio
+/// </summary>
+void Game::setupSounds()
+{
+	if (!m_backgroundMusic.openFromFile("ASSETS//AUDIO//cottages.wav"))
+	{
+		std::cout << "Error loading cottages.wav, located at ASSETS//AUDIO//cottages.wav" << std::endl;
+	}
+
+	m_backgroundMusic.setLoop(true);
+
+	if (!m_clickBuffer.loadFromFile("ASSETS//AUDIO//click.wav"))
+	{
+		std::cout << "Error loading click.wav, located at ASSETS//AUDIO//click.wav" << std::endl;
+	}
+
+	m_clickSound.setBuffer(m_clickBuffer);
+
+	m_backgroundMusic.play();
+}
+
+/// <summary>
 /// check for input
 /// just quit
 /// </summary>
@@ -224,24 +254,31 @@ void Game::processEvents()
 			{
 			case sf::Keyboard::Num1:
 				m_startRange = 0, m_endRange = 3;
+				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num2:
 				m_startRange = 3, m_endRange = 6;
+				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num3:
 				m_startRange = 6, m_endRange = 9;
+				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num4:
 				m_startRange = 9, m_endRange = 12;
+				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num5:
 				m_startRange = 12, m_endRange = 15;
+				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num6:
 				m_startRange = 15, m_endRange = 19;
+				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num7:
 				m_startRange = 19, m_endRange = 23;
+				m_clickSound.play();
 				break;
 			case sf::Keyboard::R:
 				if (m_resetting == false)
