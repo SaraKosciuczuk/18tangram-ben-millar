@@ -95,10 +95,12 @@ private:
 	float m_moveSpeed = 1.0f;
 
 	// used for accessing groups of points
-	shapeStruct m_shape[NO_SHAPES];
+	shapeStruct m_shapes[NO_SHAPES];
 	unsigned m_currentShape = 0;
 
 	// transformation matrices
+	MyVector3 m_translations[NO_SHAPES];
+	MyVector3 m_rotations[NO_SHAPES];
 	MyMatrix3 m_transformations[NO_SHAPES];
 
 	unsigned m_chosenTexture; // determines which, of four, wood textures is used
