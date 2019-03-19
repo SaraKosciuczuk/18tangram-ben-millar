@@ -186,6 +186,25 @@ MyMatrix3 MyMatrix3::operator*(const MyMatrix3 t_other) const
 }
 
 /// <summary>
+/// In-place multiplication overload for 3D matrixes
+/// </summary>
+/// <param name="t_other">RHS matrix</param>
+void MyMatrix3::operator*=(const MyMatrix3 t_other)
+{
+	MyVector3 row, column;
+
+	for (int i = 0; i < NUM_ROWS; i++) // for each row
+	{
+		for (int j = 0; j < NUM_COLS; j++) // for each column
+		{
+			row = { m[i][0],m[i][1],m[i][2] }; // elements 1, 2 and 3 of row i
+			column = { t_other.m[0][j],t_other.m[1][j],t_other.m[2][j] }; // elements 1, 2 and 3 of column j
+			m[i][j] = row.dot(column); // dot product of row i * column j
+		}
+	}
+}
+
+/// <summary>
 /// Multiplication overload to multiple a 3x1 matrix by a 3D vector (1x3 matrix)
 /// </summary>
 /// <param name="t_vector">vector to multiply matrix by</param>

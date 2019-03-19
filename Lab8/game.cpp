@@ -204,6 +204,15 @@ void Game::setupObjects()
 	m_resetBar.setPosition(10.0f, 570.0f);
 	m_resetBar.setFillColor(sf::Color::Red);
 	m_resetBar.setSize({ 200.0f,20.0f });
+
+	// initialise start and end range values for shape structs
+	m_shape[0].startRange = 0, m_shape[0].endRange = 3;
+	m_shape[1].startRange = 3, m_shape[1].endRange = 6;
+	m_shape[2].startRange = 6, m_shape[2].endRange = 9;
+	m_shape[3].startRange = 9, m_shape[3].endRange = 12;
+	m_shape[4].startRange = 12, m_shape[4].endRange = 15;
+	m_shape[5].startRange = 15, m_shape[5].endRange = 19;
+	m_shape[6].startRange = 19, m_shape[6].endRange = 23;
 }
 
 /// <summary>
@@ -253,31 +262,31 @@ void Game::processEvents()
 			switch (event.key.code)
 			{
 			case sf::Keyboard::Num1:
-				m_startRange = 0, m_endRange = 3;
+				m_currentShape = 0;
 				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num2:
-				m_startRange = 3, m_endRange = 6;
+				m_currentShape = 1;
 				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num3:
-				m_startRange = 6, m_endRange = 9;
+				m_currentShape = 2;
 				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num4:
-				m_startRange = 9, m_endRange = 12;
+				m_currentShape = 3;
 				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num5:
-				m_startRange = 12, m_endRange = 15;
+				m_currentShape = 4;
 				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num6:
-				m_startRange = 15, m_endRange = 19;
+				m_currentShape = 5;
 				m_clickSound.play();
 				break;
 			case sf::Keyboard::Num7:
-				m_startRange = 19, m_endRange = 23;
+				m_currentShape = 6;
 				m_clickSound.play();
 				break;
 			case sf::Keyboard::R:
@@ -317,6 +326,7 @@ void Game::resetShapes()
 {
 	for (int i = 0; i < NO_POINTS; i++)
 	{
+		// This should now reset translation and rotation matrices
 		m_shapePoints[i] = M_INITIAL_POSITIONS[i]; // reset point coords to their original
 		m_renderPoints[i].texCoords = m_shapePoints[i]; // setup texture coords
 	}
@@ -362,6 +372,10 @@ void Game::update(sf::Time t_deltaTime)
 
 	// ++++++++++ TAKE USER INPUT ++++++++++
 
+	// *** START and END are assigned ***
+	unsigned start = m_shape[m_currentShape].startRange, end = m_shape[m_currentShape].endRange;
+	// **********************************
+
 	// +++++++ SPEED UP MOVEMENT +++++++
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))
@@ -377,10 +391,11 @@ void Game::update(sf::Time t_deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		for (unsigned i = m_startRange; i < m_endRange; i++)
+		m_transformations[m_currentShape] *= MyMatrix3::translation({ 0.0,-m_moveSpeed,0.0 });
+		/*for (unsigned i = start; i < end; i++)
 		{
 			m_shapePoints[i] = MyMatrix3::translation({ 0.0,-m_moveSpeed,0.0 }) * m_shapePoints[i];
-		}
+		}*/
 	}
 
 
@@ -388,10 +403,11 @@ void Game::update(sf::Time t_deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		for (unsigned i = m_startRange; i < m_endRange; i++)
+		m_transformations[m_currentShape] *= MyMatrix3::translation({ 0.0,m_moveSpeed,0.0 });
+		/*for (unsigned i = start; i < end; i++)
 		{
 			m_shapePoints[i] = MyMatrix3::translation({ 0.0,m_moveSpeed,0.0 }) * m_shapePoints[i];
-		}
+		}*/
 	}
 
 
@@ -399,10 +415,12 @@ void Game::update(sf::Time t_deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		for (unsigned i = m_startRange; i < m_endRange; i++)
+
+		m_transformations[m_currentShape] *= MyMatrix3::translation({ -m_moveSpeed,0.0,0.0 });
+		/*for (unsigned i = start; i < end; i++)
 		{
 			m_shapePoints[i] = MyMatrix3::translation({ -m_moveSpeed,0.0,0.0 }) * m_shapePoints[i];
-		}
+		}*/
 	}
 
 
@@ -410,20 +428,21 @@ void Game::update(sf::Time t_deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		for (unsigned i = m_startRange; i < m_endRange; i++)
+		m_transformations[m_currentShape] *= MyMatrix3::translation({ m_moveSpeed,0.0,0.0 });
+		/*for (unsigned i = start; i < end; i++)
 		{
 			m_shapePoints[i] = MyMatrix3::translation({ m_moveSpeed,0.0,0.0 }) * m_shapePoints[i];
-		}
+		}*/
 	}
 
 
 	// +++++++ ROTATE PIECE CLOCKWISE +++++++
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 	{
-		MyVector3 center = Game::findCenter(m_shapePoints, m_startRange, m_endRange);
+		MyVector3 center = Game::findCenter(m_shapePoints, start, end);
 		MyMatrix3 rotation = Game::rotate(center, rotationDir::counterclockwise);
 
-		for (unsigned i = m_startRange; i < m_endRange; i++)
+		for (unsigned i = start; i < end; i++)
 		{
 			m_shapePoints[i] = rotation * m_shapePoints[i];
 		}
@@ -433,10 +452,10 @@ void Game::update(sf::Time t_deltaTime)
 	// +++++++ ROTATE PIECE ANTICLOCKWISE +++++++
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
 	{
-		MyVector3 center = Game::findCenter(m_shapePoints, m_startRange, m_endRange);
+		MyVector3 center = Game::findCenter(m_shapePoints, start, end);
 		MyMatrix3 rotation = Game::rotate(center, rotationDir::clockwise);
 		
-		for (unsigned i = m_startRange; i < m_endRange; i++)
+		for (unsigned i = start; i < end; i++)
 		{
 			m_shapePoints[i] = rotation * m_shapePoints[i];
 		}
@@ -450,7 +469,7 @@ void Game::update(sf::Time t_deltaTime)
 	m_highlight.clear();
 
 	// for all points
-	for (unsigned i = 0; i < NO_POINTS; i++)
+	for (unsigned i = 0, shape = 0; i < NO_POINTS; i++)
 	{
 		if (i >= 15)
 		{
@@ -461,18 +480,19 @@ void Game::update(sf::Time t_deltaTime)
 		else
 		{
 			// append points to triangles
-			m_renderPoints[i].position = m_shapePoints[i];
+			m_renderPoints[i].position = m_transformations[i] * m_shapePoints[i];
 			m_triangle.append(m_renderPoints[i]);
 		}
 	}
 
+
 	// Draw our highlight lines around chosen shape
-	for (unsigned i = 0, j = m_startRange; i < (m_endRange-m_startRange)*2; i++) // loop for num points * 2
+	for (unsigned i = 0, j = start; i < (end-start)*2; i++) // loop for num points * 2
 	{
 		if (i == 5) // if this is our last point
 		{
 			// link back to the starting point
-			m_highlightRenderPoints[i].position = m_shapePoints[m_startRange];
+			m_highlightRenderPoints[i].position = m_shapePoints[start];
 		}
 		else
 		{
@@ -536,17 +556,17 @@ void Game::render()
 	m_window.draw(m_highlight);
 
 	// for all shapes
-	for (int shape = 1, start = 0, end = 3; shape < 8; shape++)
+	for (int shape = 1, rangeStart = 0, rangeEnd = 3; shape < 8; shape++)
 	{
 		// if shape highlighted, draw white text. Otherwise, draw black
-		m_numberText.setFillColor((start == m_startRange) ? sf::Color::White : sf::Color::Black);
+		m_numberText.setFillColor((rangeStart == m_shape[m_currentShape].startRange) ? sf::Color::White : sf::Color::Black);
 
 		// pass off parameters to draw number
-		drawNumber(shape, start, end);
+		drawNumber(shape, rangeStart, rangeEnd);
 
 		// if it's a triangle, increment by 3. If it's a quad, increment by 4
-		start += (shape < 6) ? 3 : 4;
-		end += (shape < 6) ? 3 : 4;
+		rangeStart += (shape < 6) ? 3 : 4;
+		rangeEnd += (shape < 6) ? 3 : 4;
 	}
 
 	if (m_resetting == true)

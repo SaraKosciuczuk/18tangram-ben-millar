@@ -13,6 +13,7 @@
 /// Session 9 Start: 16:20 End: 17:10
 /// Session 10 Start: 16:00 End: 16:50
 /// Session 11 Start: 17:40 End: 18:00 TOTAL TIME: 7 hours 45 minutes
+/// Session 12 Start: 12:10 End:
 /// </summary>
 /// 
 /// KNOWN BUGS: I can't get the 'highlight' vertex lines to draw around the entire shape, only all but one.
@@ -43,6 +44,11 @@ enum class rotationDir
 {
 	clockwise = 1,
 	counterclockwise = -1
+};
+
+struct shapeStruct
+{
+	unsigned startRange, endRange;
 };
 
 /// <summary>
@@ -89,8 +95,11 @@ private:
 	float m_moveSpeed = 1.0f;
 
 	// used for accessing groups of points
-	unsigned m_startRange = 0;
-	unsigned m_endRange = 3;
+	shapeStruct m_shape[NO_SHAPES];
+	unsigned m_currentShape = 0;
+
+	// transformation matrices
+	MyMatrix3 m_transformations[NO_SHAPES];
 
 	unsigned m_chosenTexture; // determines which, of four, wood textures is used
 

@@ -23,6 +23,7 @@ public:
 	MyMatrix3 operator +(const MyMatrix3 t_other) const;
 	MyMatrix3 operator -(const MyMatrix3 t_other) const;
 	MyMatrix3 operator *(const MyMatrix3 t_other) const;
+	void operator *=(const MyMatrix3 t_other);
 	MyVector3 operator *(const MyVector3 t_vector)const;
 	MyMatrix3 operator *(const double t_scale)const;
 
