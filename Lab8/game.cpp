@@ -30,7 +30,7 @@ Game::Game() :
 	m_triangle{ sf::Triangles },
 	m_quad{ sf::Quads },
 	m_highlight{ sf::Lines },
-	M_INITIAL_POSITIONS{
+	m_shapePoints{
 		 { 100.0,150.0, 1.0 }, // triangle 1
 		 { 200.0,250.0, 1.0 },
 		 { 300.0,150.0, 1.0 },
@@ -194,6 +194,12 @@ void Game::setupSprites()
 	}
 
 	m_instructionsSprite.setTexture(m_instructionsTexture);
+
+	// +++++ Setup texture coordinates for shapes +++++
+	for (int i = 0; i < NO_POINTS; i++)
+	{
+		m_renderPoints[i].texCoords = m_shapePoints[i];
+	}
 }
 
 /// <summary>
@@ -324,11 +330,11 @@ void Game::processEvents()
 /// </summary>
 void Game::resetShapes()
 {
-	for (int i = 0; i < NO_POINTS; i++)
+	// reset shapes translations and rotations
+	for (int i = 0; i < NO_SHAPES; i++)
 	{
-		// This should now reset translation and rotation matrices
-		m_shapePoints[i] = M_INITIAL_POSITIONS[i]; // reset point coords to their original
-		m_renderPoints[i].texCoords = m_shapePoints[i]; // setup texture coords
+		m_shapes[i].translation = { 0.0,0.0,0.0 };
+		m_shapes[i].rotation = 0.0;
 	}
 
 	// cycle through our 4 wood textures
@@ -391,11 +397,7 @@ void Game::update(sf::Time t_deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		m_translations[m_currentShape] += { 0.0, -m_moveSpeed, 0.0 };
-		/*for (unsigned i = start; i < end; i++)
-		{
-			m_shapePoints[i] = MyMatrix3::translation({ 0.0,-m_moveSpeed,0.0 }) * m_shapePoints[i];
-		}*/
+		m_shapes[m_currentShape].translation += { 0.0, -m_moveSpeed, 0.0 };
 	}
 
 
@@ -403,11 +405,7 @@ void Game::update(sf::Time t_deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		m_translations[m_currentShape] += { 0.0, m_moveSpeed, 0.0 };
-		/*for (unsigned i = start; i < end; i++)
-		{
-			m_shapePoints[i] = MyMatrix3::translation({ 0.0,m_moveSpeed,0.0 }) * m_shapePoints[i];
-		}*/
+		m_shapes[m_currentShape].translation += { 0.0, m_moveSpeed, 0.0 };
 	}
 
 
@@ -416,11 +414,7 @@ void Game::update(sf::Time t_deltaTime)
 		sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 
-		m_translations[m_currentShape] += { -m_moveSpeed, 0.0, 0.0 };
-		/*for (unsigned i = start; i < end; i++)
-		{
-			m_shapePoints[i] = MyMatrix3::translation({ -m_moveSpeed,0.0,0.0 }) * m_shapePoints[i];
-		}*/
+		m_shapes[m_currentShape].translation += { -m_moveSpeed, 0.0, 0.0 };
 	}
 
 
@@ -428,37 +422,21 @@ void Game::update(sf::Time t_deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		m_translations[m_currentShape] += { m_moveSpeed, 0.0, 0.0 };
-		/*for (unsigned i = start; i < end; i++)
-		{
-			m_shapePoints[i] = MyMatrix3::translation({ m_moveSpeed,0.0,0.0 }) * m_shapePoints[i];
-		}*/
+		m_shapes[m_currentShape].translation += { m_moveSpeed, 0.0, 0.0 };
 	}
 
 
 	// +++++++ ROTATE PIECE CLOCKWISE +++++++
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 	{
-		MyVector3 center = Game::findCenter(m_shapePoints, start, end);
-		MyMatrix3 rotation = Game::rotate(center, rotationDir::counterclockwise);
-
-		for (unsigned i = start; i < end; i++)
-		{
-			m_shapePoints[i] = rotation * m_shapePoints[i];
-		}
+		m_shapes[m_currentShape].rotation -= (3.14159 / 180.0);
 	}
 
 
 	// +++++++ ROTATE PIECE ANTICLOCKWISE +++++++
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
 	{
-		MyVector3 center = Game::findCenter(m_shapePoints, start, end);
-		MyMatrix3 rotation = Game::rotate(center, rotationDir::clockwise);
-		
-		for (unsigned i = start; i < end; i++)
-		{
-			m_shapePoints[i] = rotation * m_shapePoints[i];
-		}
+		m_shapes[m_currentShape].rotation += (3.14159 / 180.0);
 	}
 
 	// ++++++++++ END USER INPUT ++++++++++
@@ -468,30 +446,8 @@ void Game::update(sf::Time t_deltaTime)
 	m_quad.clear();
 	m_highlight.clear();
 
-	for (int i = 0; i < NO_SHAPES; i++)
-	{
-		m_transformations[i] = MyMatrix3::translation(m_translations[i]);
-	}
-
-	// for all points
-	for (unsigned i = 0, shape = 0; i < NO_POINTS; i++)
-	{
-		if (i >= 15)
-		{
-			if (i % 4 == 0) shape++;
-			// append points to quads
-			m_renderPoints[i].position = m_shapePoints[i];
-			m_quad.append(m_renderPoints[i]);
-		}
-		else
-		{
-			if (i > 0 && i % 3 == 0) shape++;
-			// append points to triangles
-			m_renderPoints[i].position = m_transformations[shape] * m_shapePoints[i];
-			m_triangle.append(m_renderPoints[i]);
-		}
-	}
-
+	// translate all points
+	calculateTranslations();
 
 	// Draw our highlight lines around chosen shape
 	for (unsigned i = 0, j = start; i < (end-start)*2; i++) // loop for num points * 2
@@ -514,18 +470,52 @@ void Game::update(sf::Time t_deltaTime)
 }
 
 /// <summary>
+/// Calculates and applies translations to all shapes, passing the new position to their render points
+/// </summary>
+void Game::calculateTranslations()
+{
+	// calculate transformations for each shape
+	for (int i = 0; i < NO_SHAPES; i++)
+	{
+		MyVector3 center = Game::findCenter(m_shapes[i], m_shapePoints);
+
+		m_rotationMatrix[i] = Game::rotate(center, m_shapes[i].rotation);
+		m_translationMatrix[i] = MyMatrix3::translation(m_shapes[i].translation);
+	}
+
+	// apply transformations to all points and assign to vertex array
+	for (unsigned i = 0, shape = 0; i < NO_POINTS; i++)
+	{
+		if (i >= 15)
+		{
+			if (i == 15 || i == 19) shape++;
+			// append points to quads
+			m_renderPoints[i].position = m_translationMatrix[shape] * m_rotationMatrix[shape] * m_shapePoints[i];
+			m_quad.append(m_renderPoints[i]);
+		}
+		else
+		{
+			if (i > 0 && i % 3 == 0) shape++;
+			// append points to triangles
+			m_renderPoints[i].position = m_translationMatrix[shape] * m_rotationMatrix[shape] * m_shapePoints[i];
+			m_triangle.append(m_renderPoints[i]);
+		}
+	}
+}
+
+/// <summary>
 /// Determines the geometric center of a shape given its points
 /// </summary>
 /// <param name="t_array">array of points</param>
 /// <param name="t_start">start point in array</param>
 /// <param name="t_end">end point in array</param>
 /// <returns>location of the center as a MyVector3</returns>
-MyVector3 Game::findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end)
+MyVector3 Game::findCenter(shapeStruct t_shape, MyVector3 t_array[23])
 {
 	MyVector3 sum = { 0.0,0.0,0.0 }, result = { 0.0,0.0,0.0 };
-	double range = t_end - t_start;
+	double range = t_shape.endRange - t_shape.startRange;
 
-	for (unsigned i = t_start; i < t_end; i++)
+	for (unsigned i = t_shape.startRange; i < t_shape.endRange; i++)
 	{
 		sum += t_array[i];
 	}
@@ -540,9 +530,9 @@ MyVector3 Game::findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end
 /// <param name="t_center">center of rotation</param>
 /// <param name="t_direction">direction of rotation</param>
 /// <returns>transformation matrix</returns>
-MyMatrix3 Game::rotate(MyVector3 t_center, rotationDir t_direction)
+MyMatrix3 Game::rotate(MyVector3 t_center, double t_angle)
 {
-	MyMatrix3 result = MyMatrix3::translation(t_center) * MyMatrix3::rotationZ((3.14159 / 180.0) * int(t_direction)) * MyMatrix3::translation(-t_center);
+	MyMatrix3 result = MyMatrix3::translation(t_center) * MyMatrix3::rotationZ(t_angle) * MyMatrix3::translation(-t_center);
 
 	return result;
 }
@@ -562,25 +552,23 @@ void Game::render()
 	m_window.draw(m_quad, &m_woodTextures[m_chosenTexture]);
 	m_window.draw(m_highlight);
 
-	// for all shapes
-	for (int shape = 1, rangeStart = 0, rangeEnd = 3; shape < 8; shape++)
+	// draw numbers on all shapes
+	for (int i = 0; i < NO_SHAPES; i++)
 	{
 		// if shape highlighted, draw white text. Otherwise, draw black
-		m_numberText.setFillColor((rangeStart == m_shapes[m_currentShape].startRange) ? sf::Color::White : sf::Color::Black);
+		m_numberText.setFillColor((i == m_currentShape) ? sf::Color::White : sf::Color::Black);
 
 		// pass off parameters to draw number
-		drawNumber(shape, rangeStart, rangeEnd);
-
-		// if it's a triangle, increment by 3. If it's a quad, increment by 4
-		rangeStart += (shape < 6) ? 3 : 4;
-		rangeEnd += (shape < 6) ? 3 : 4;
+		drawNumber(m_shapes[i], i);
 	}
 
+	// if player holding [R]
 	if (m_resetting == true)
 	{
 		drawResetBar();
 	}
 
+	// if player holding [I]
 	if (m_showInstructions == true)
 	{
 		m_window.draw(m_instructionsSprite);
@@ -599,12 +587,20 @@ void Game::render()
 /// <param name="t_number">Number to draw on shape</param>
 /// <param name="t_start">Start range of points to find center</param>
 /// <param name="t_end">End range of points to find center</param>
-void Game::drawNumber(int t_number, int t_start, int t_end)
+void Game::drawNumber(shapeStruct t_shape, int t_num)
 {
-	MyVector3 center = Game::findCenter(m_shapePoints, t_start, t_end);
+	MyVector3 center = { 0.0,0.0,0.0 };
+
+	for (int i = t_shape.startRange; i < t_shape.endRange; i++)
+	{
+		center += m_renderPoints[i].position;
+	}
+
+	center = center / 3.0;
+
 	MyVector3 offset = { -5.0,-5.0,0.0 };
 
-	m_numberText.setString(std::to_string(t_number));
+	m_numberText.setString(std::to_string(t_num+1));
 	m_numberText.setPosition(center + offset);
 
 	m_window.draw(m_numberText);

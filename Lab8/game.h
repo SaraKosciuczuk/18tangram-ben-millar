@@ -13,7 +13,9 @@
 /// Session 9 Start: 16:20 End: 17:10
 /// Session 10 Start: 16:00 End: 16:50
 /// Session 11 Start: 17:40 End: 18:00 TOTAL TIME: 7 hours 45 minutes
-/// Session 12 Start: 12:10 End:
+/// Session 12 Start: 12:10 End: 12:55
+/// Session 13 Start: 14:30 End: 14:50
+/// Session 14 Start: 18:00 End: 18:20 TOTAL TIME: 9 hours 10 minutes
 /// </summary>
 /// 
 /// KNOWN BUGS: I can't get the 'highlight' vertex lines to draw around the entire shape, only all but one.
@@ -37,18 +39,11 @@
 const unsigned NO_POINTS = 23;
 const unsigned NO_SHAPES = 7;
 
-/// <summary>
-/// enum for rotation direction
-/// </summary>
-enum class rotationDir
-{
-	clockwise = 1,
-	counterclockwise = -1
-};
-
 struct shapeStruct
 {
 	unsigned startRange, endRange;
+	MyVector3 translation;
+	double rotation;
 };
 
 /// <summary>
@@ -70,10 +65,11 @@ private:
 	void processEvents(); // process user input
 	void resetShapes(); // return shapes to their starting position
 	void update(sf::Time t_deltaTime); // main update loop for game logic
-	static MyVector3 findCenter(MyVector3 t_array[], unsigned t_start, unsigned t_end); // finds the geometric center of a shape
-	static MyMatrix3 rotate(MyVector3 t_center, rotationDir t_direction); // rotates a shape in a given direction by 1 degree
+	void calculateTranslations(); // calculate and apply translations to all shapes
+	static MyVector3 findCenter(shapeStruct t_shape, MyVector3 t_array[23]); // finds the geometric center of a shape
+	static MyMatrix3 rotate(MyVector3 t_center, double t_angle); // rotates a shape in a given direction by 1 degree
 	void render(); // clear frame, render new framebuffer, and flip buffers
-	void drawNumber(int t_number, int t_start, int t_end); // draws number text onto shape
+	void drawNumber(shapeStruct t_shape, int t_num); // draws number text onto shape
 	void drawResetBar(); // draws the reset 'loading' bar when resetting
 
 	// +++++++++++++++++++++++++++++
@@ -81,13 +77,11 @@ private:
 
 	// +++++++++ VARIABLES +++++++++
 
-	const MyVector3 M_INITIAL_POSITIONS[NO_POINTS];
-
 	sf::VertexArray m_triangle; // used to draw triangles
 	sf::VertexArray m_quad; // used to draw quads
 	sf::VertexArray m_highlight; // used to highlight active shape
 
-	sf::Vertex m_highlightRenderPoints[8];
+	sf::Vertex m_highlightRenderPoints[8]; 
 	sf::Vertex m_renderPoints[NO_POINTS]; // used to store vertexs, especailly colour
 	MyVector3 m_shapePoints[NO_POINTS]; // used for game logic
 
@@ -99,9 +93,8 @@ private:
 	unsigned m_currentShape = 0;
 
 	// transformation matrices
-	MyVector3 m_translations[NO_SHAPES];
-	MyVector3 m_rotations[NO_SHAPES];
-	MyMatrix3 m_transformations[NO_SHAPES];
+	MyMatrix3 m_translationMatrix[NO_SHAPES]; // transformation matrices for each shape
+	MyMatrix3 m_rotationMatrix[NO_SHAPES];
 
 	unsigned m_chosenTexture; // determines which, of four, wood textures is used
 
